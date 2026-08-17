@@ -1,6 +1,3 @@
-<?php 
-session_start();
-?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -312,28 +309,32 @@ session_start();
 </head>
 <body>
 
+<!-- ===== TOP BAR ===== -->
 <div class="topbar">
     <div class="brand">TVETMARA LUMUT</div>
     <div class="menu-icon" onclick="toggleMenu()">☰</div>
 </div>
 
+<!-- ===== OVERLAY (for menu) ===== -->
 <div id="overlay" onclick="toggleMenu()"></div>
 
+<!-- ===== SIDE MENU ===== -->
 <div id="menu" class="menu">
-    <a href="index.php">🏠 Home</a>
-    <a href="login.php">🔐 Login</a>
-    <a href="student_signup.php">📝 Student Sign Up</a>
-    <a href="lecturer_signup.php">📝 Lecturer Sign Up</a>
+    <a href="index.html">🏠 Home</a>
+    <a href="login.html">🔐 Login</a>
+    <a href="student_signup.html">📝 Student Sign Up</a>
+    <a href="lecturer_signup.html">📝 Lecturer Sign Up</a>
     <a href="#">ℹ️ About</a>
 </div>
 
+<!-- ===== LOGIN FORM ===== -->
 <div class="login-container">
     <div class="login-box glass">
         <h2 class="main-title" id="pageTitle">🔐 Student Login</h2>
 
-        <div id="errorMsg" class="error-msg" style="display: none;"></div>
+        <div id="errorMsg" class="error-msg"></div>
 
-        <!-- Role Selection -->
+        <!-- Role Selection Buttons -->
         <div class="role-selection">
             <button type="button" id="studentRoleBtn" class="role-btn student active" onclick="selectRole('student')">🎓 Student</button>
             <button type="button" id="lecturerRoleBtn" class="role-btn lecturer" onclick="selectRole('lecturer')">👨‍🏫 Lecturer</button>
@@ -343,7 +344,7 @@ session_start();
         <form id="loginForm" onsubmit="return handleLogin()">
             <div class="input-group">
                 <label id="emailLabel">📧 Email Address</label>
-                <input type="text" id="email" placeholder="your@email.com" required>
+                <input type="email" id="email" placeholder="your@email.com" required>
             </div>
 
             <div class="input-group">
@@ -365,20 +366,33 @@ session_start();
             🔒 Admin access is restricted
         </div>
 
-        <a href="index.php" class="back-link">← Back to Home</a>
+        <a href="index.html" class="back-link">← Back to Home</a>
     </div>
 </div>
 
+<!-- ===== JAVASCRIPT ===== -->
 <script>
+// ============================================
+// VARIABLE: Untuk simpan role yang dipilih
+// ============================================
 let selectedRole = 'student';
 
-function toggleMenu(){
+// ============================================
+// FUNCTION 1: toggleMenu()
+// Tujuan: Buka / tutup side menu
+// ============================================
+function toggleMenu() {
     var menu = document.getElementById("menu");
     var overlay = document.getElementById("overlay");
     menu.classList.toggle("active");
     overlay.classList.toggle("active");
 }
 
+// ============================================
+// FUNCTION 2: selectRole(role)
+// Tujuan: Tukar UI mengikut role yang dipilih
+// Parameter: 'student', 'lecturer', atau 'admin'
+// ============================================
 function selectRole(role) {
     selectedRole = role;
     
@@ -389,17 +403,23 @@ function selectRole(role) {
     const pageTitle = document.getElementById('pageTitle');
     const emailLabel = document.getElementById('emailLabel');
     const emailInput = document.getElementById('email');
+    const errorMsg = document.getElementById('errorMsg');
     
-    // Reset all
+    // Sembunyikan error (kalau ada)
+    errorMsg.style.display = 'none';
+    errorMsg.innerHTML = '';
+    
+    // Reset semua button active
     studentBtn.classList.remove('active');
     lecturerBtn.classList.remove('active');
     adminBtn.classList.remove('active');
     
-    // Hide all signup links
+    // Sembunyikan semua signup links
     document.getElementById('studentSignupLink').style.display = 'none';
     document.getElementById('lecturerSignupLink').style.display = 'none';
     document.getElementById('adminSignupLink').style.display = 'none';
     
+    // --- STUDENT ---
     if(role === 'student') {
         studentBtn.classList.add('active');
         document.getElementById('studentSignupLink').style.display = 'block';
@@ -410,6 +430,8 @@ function selectRole(role) {
         emailInput.type = 'email';
         emailInput.placeholder = 'student@email.com';
         emailInput.value = '';
+    
+    // --- LECTURER ---
     } else if(role === 'lecturer') {
         lecturerBtn.classList.add('active');
         document.getElementById('lecturerSignupLink').style.display = 'block';
@@ -420,6 +442,8 @@ function selectRole(role) {
         emailInput.type = 'email';
         emailInput.placeholder = 'lecturer@tvetmara.edu.my';
         emailInput.value = '';
+    
+    // --- ADMIN ---
     } else if(role === 'admin') {
         adminBtn.classList.add('active');
         document.getElementById('adminSignupLink').style.display = 'block';
@@ -433,26 +457,33 @@ function selectRole(role) {
     }
 }
 
+// ============================================
+// FUNCTION 3: handleLogin()
+// Tujuan: Sahkan login dan redirect
+// ============================================
 function handleLogin() {
     let email = document.getElementById('email').value.trim();
     let password = document.getElementById('password').value.trim();
     let errorMsg = document.getElementById('errorMsg');
     
+    // Reset error
     errorMsg.style.display = 'none';
     errorMsg.innerHTML = '';
     
+    // Validation: Check empty fields
     if (!email || !password) {
         errorMsg.style.display = 'block';
         errorMsg.innerHTML = '❌ Please fill in all fields.';
         return false;
     }
     
+    // --- STUDENT LOGIN ---
     if(selectedRole === 'student') {
-        // Student login - guna localStorage
         let students = JSON.parse(localStorage.getItem('students')) || [];
         let student = students.find(s => s.email === email && s.password === password);
         
         if(student) {
+            // Simpan data student dalam sessionStorage
             sessionStorage.setItem('loggedInStudent', JSON.stringify({
                 id: student.id,
                 name: student.name,
@@ -466,15 +497,16 @@ function handleLogin() {
                 semester: student.semester,
                 program: student.program
             }));
-            window.location.href = 'student_dashboard.php';
+            // Redirect ke dashboard student
+            window.location.href = 'student_dashboard.html';
         } else {
             errorMsg.style.display = 'block';
             errorMsg.innerHTML = '❌ Invalid email or password. Please try again.';
         }
         return false;
-        
+    
+    // --- LECTURER LOGIN ---
     } else if(selectedRole === 'lecturer') {
-        // Lecturer login - guna localStorage
         let lecturers = JSON.parse(localStorage.getItem('lecturers')) || [];
         let lecturer = lecturers.find(l => l.email === email && l.password === password);
         
@@ -490,15 +522,15 @@ function handleLogin() {
                 vehicle_type: lecturer.vehicle_type || '',
                 vehicle_color: lecturer.vehicle_color || ''
             }));
-            window.location.href = 'lecturer_dashboard.php';
+            window.location.href = 'lecturer_dashboard.html';
         } else {
             errorMsg.style.display = 'block';
             errorMsg.innerHTML = '❌ Invalid email or password. Please try again.';
         }
         return false;
-        
+    
+    // --- ADMIN LOGIN (Hardcoded) ---
     } else if(selectedRole === 'admin') {
-        // Admin login - FIXED CREDENTIALS
         const ADMIN_USERNAME = 'admin';
         const ADMIN_PASSWORD = 'admin123';
         
@@ -508,8 +540,7 @@ function handleLogin() {
                 username: ADMIN_USERNAME,
                 role: 'admin'
             }));
-            // Admin terus ke warden dashboard
-            window.location.href = 'warden_dashboard.php';
+            window.location.href = 'warden_dashboard.html';
         } else {
             errorMsg.style.display = 'block';
             errorMsg.innerHTML = '❌ Invalid username or password.';
@@ -520,7 +551,10 @@ function handleLogin() {
     return false;
 }
 
-// Auto-select role if parameter exists
+// ============================================
+// FUNCTION 4: Auto-select role from URL
+// Tujuan: Boleh guna ?role=admin di URL
+// ============================================
 window.onload = function() {
     const urlParams = new URLSearchParams(window.location.search);
     const role = urlParams.get('role');
